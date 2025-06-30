@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,8 @@ interface Candidate {
   slogan: string;
   photo: string;
   votes: number;
+  party: string;
+  partyLogo: string;
 }
 
 interface Position {
@@ -28,72 +29,72 @@ const initialPositions: Position[] = [
     id: 'head-boy',
     title: 'Head Boy',
     candidates: [
-      { id: 'hb1', name: 'Arjun Sharma', class: '12th A', slogan: 'Leading with Vision', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', votes: 45 },
-      { id: 'hb2', name: 'Rohit Kumar', class: '12th B', slogan: 'Unity in Diversity', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', votes: 38 },
-      { id: 'hb3', name: 'Karan Singh', class: '12th C', slogan: 'Excellence Together', photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', votes: 52 }
+      { id: 'hb1', name: 'Arjun Sharma', class: '12th A', slogan: 'Leading with Vision', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', votes: 45, party: 'Student Unity Party', partyLogo: '🏛️' },
+      { id: 'hb2', name: 'Rohit Kumar', class: '12th B', slogan: 'Unity in Diversity', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', votes: 38, party: 'Progressive Alliance', partyLogo: '⚡' },
+      { id: 'hb3', name: 'Karan Singh', class: '12th C', slogan: 'Excellence Together', photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', votes: 52, party: 'Youth Forward', partyLogo: '🚀' }
     ]
   },
   {
     id: 'vice-head-boy',
     title: 'Vice Head Boy',
     candidates: [
-      { id: 'vhb1', name: 'Amit Patel', class: '11th A', slogan: 'Supporting Success', photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face', votes: 41 },
-      { id: 'vhb2', name: 'Raj Gupta', class: '11th B', slogan: 'Team Spirit First', photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face', votes: 49 },
-      { id: 'vhb3', name: 'Dev Agarwal', class: '11th C', slogan: 'Progress Together', photo: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face', votes: 35 }
+      { id: 'vhb1', name: 'Amit Patel', class: '11th A', slogan: 'Supporting Success', photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face', votes: 41, party: 'Student Unity Party', partyLogo: '🏛️' },
+      { id: 'vhb2', name: 'Raj Gupta', class: '11th B', slogan: 'Team Spirit First', photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face', votes: 49, party: 'Progressive Alliance', partyLogo: '⚡' },
+      { id: 'vhb3', name: 'Dev Agarwal', class: '11th C', slogan: 'Progress Together', photo: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face', votes: 35, party: 'Youth Forward', partyLogo: '🚀' }
     ]
   },
   {
     id: 'head-girl',
     title: 'Head Girl',
     candidates: [
-      { id: 'hg1', name: 'Priya Sharma', class: '12th A', slogan: 'Empowering Change', photo: 'https://images.unsplash.com/photo-1494790108755-2616b332c22b?w=150&h=150&fit=crop&crop=face', votes: 58 },
-      { id: 'hg2', name: 'Sneha Joshi', class: '12th B', slogan: 'Inspiring Leadership', photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', votes: 43 },
-      { id: 'hg3', name: 'Kavya Reddy', class: '12th C', slogan: 'Creating Impact', photo: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face', votes: 37 }
+      { id: 'hg1', name: 'Priya Sharma', class: '12th A', slogan: 'Empowering Change', photo: 'https://images.unsplash.com/photo-1494790108755-2616b332c22b?w=150&h=150&fit=crop&crop=face', votes: 58, party: 'Student Unity Party', partyLogo: '🏛️' },
+      { id: 'hg2', name: 'Sneha Joshi', class: '12th B', slogan: 'Inspiring Leadership', photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', votes: 43, party: 'Progressive Alliance', partyLogo: '⚡' },
+      { id: 'hg3', name: 'Kavya Reddy', class: '12th C', slogan: 'Creating Impact', photo: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face', votes: 37, party: 'Youth Forward', partyLogo: '🚀' }
     ]
   },
   {
     id: 'vice-head-girl',
     title: 'Vice Head Girl',
     candidates: [
-      { id: 'vhg1', name: 'Anita Das', class: '11th A', slogan: 'Building Bridges', photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face', votes: 44 },
-      { id: 'vhg2', name: 'Riya Mehta', class: '11th B', slogan: 'Positive Change', photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&h=150&fit=crop&crop=face', votes: 51 },
-      { id: 'vhg3', name: 'Shruti Iyer', class: '11th C', slogan: 'Student Voice', photo: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=150&h=150&fit=crop&crop=face', votes: 29 }
+      { id: 'vhg1', name: 'Anita Das', class: '11th A', slogan: 'Building Bridges', photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face', votes: 44, party: 'Student Unity Party', partyLogo: '🏛️' },
+      { id: 'vhg2', name: 'Riya Mehta', class: '11th B', slogan: 'Positive Change', photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&h=150&fit=crop&crop=face', votes: 51, party: 'Progressive Alliance', partyLogo: '⚡' },
+      { id: 'vhg3', name: 'Shruti Iyer', class: '11th C', slogan: 'Student Voice', photo: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=150&h=150&fit=crop&crop=face', votes: 29, party: 'Youth Forward', partyLogo: '🚀' }
     ]
   },
   {
     id: 'captain-boy',
     title: 'Captain Boy',
     candidates: [
-      { id: 'cb1', name: 'Vikas Yadav', class: '10th A', slogan: 'Sports Excellence', photo: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=150&h=150&fit=crop&crop=face', votes: 47 },
-      { id: 'cb2', name: 'Harsh Tiwari', class: '10th B', slogan: 'Athletic Spirit', photo: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face', votes: 39 },
-      { id: 'cb3', name: 'Akash Verma', class: '10th C', slogan: 'Fitness First', photo: 'https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=150&h=150&fit=crop&crop=face', votes: 55 }
+      { id: 'cb1', name: 'Vikas Yadav', class: '10th A', slogan: 'Sports Excellence', photo: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=150&h=150&fit=crop&crop=face', votes: 47, party: 'Athletic Champions', partyLogo: '⚽' },
+      { id: 'cb2', name: 'Harsh Tiwari', class: '10th B', slogan: 'Athletic Spirit', photo: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face', votes: 39, party: 'Sports Unity', partyLogo: '🏆' },
+      { id: 'cb3', name: 'Akash Verma', class: '10th C', slogan: 'Fitness First', photo: 'https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=150&h=150&fit=crop&crop=face', votes: 55, party: 'Power Sports', partyLogo: '💪' }
     ]
   },
   {
     id: 'vice-captain-boy',
     title: 'Vice Captain Boy',
     candidates: [
-      { id: 'vcb1', name: 'Nikhil Jain', class: '9th A', slogan: 'Team Player', photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop&crop=face', votes: 42 },
-      { id: 'vcb2', name: 'Shubham Roy', class: '9th B', slogan: 'Fair Play', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', votes: 46 },
-      { id: 'vcb3', name: 'Varun Nair', class: '9th C', slogan: 'Sportsmanship', photo: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=150&h=150&fit=crop&crop=face', votes: 33 }
+      { id: 'vcb1', name: 'Nikhil Jain', class: '9th A', slogan: 'Team Player', photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop&crop=face', votes: 42, party: 'Athletic Champions', partyLogo: '⚽' },
+      { id: 'vcb2', name: 'Shubham Roy', class: '9th B', slogan: 'Fair Play', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', votes: 46, party: 'Sports Unity', partyLogo: '🏆' },
+      { id: 'vcb3', name: 'Varun Nair', class: '9th C', slogan: 'Sportsmanship', photo: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=150&h=150&fit=crop&crop=face', votes: 33, party: 'Power Sports', partyLogo: '💪' }
     ]
   },
   {
     id: 'captain-girl',
     title: 'Captain Girl',
     candidates: [
-      { id: 'cg1', name: 'Deepika Singh', class: '10th A', slogan: 'Champions Rise', photo: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face', votes: 53 },
-      { id: 'cg2', name: 'Pooja Bansal', class: '10th B', slogan: 'Breaking Barriers', photo: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&h=150&fit=crop&crop=face', votes: 41 },
-      { id: 'cg3', name: 'Nisha Pandey', class: '10th C', slogan: 'Winning Together', photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', votes: 36 }
+      { id: 'cg1', name: 'Deepika Singh', class: '10th A', slogan: 'Champions Rise', photo: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face', votes: 53, party: 'Athletic Champions', partyLogo: '⚽' },
+      { id: 'cg2', name: 'Pooja Bansal', class: '10th B', slogan: 'Breaking Barriers', photo: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&h=150&fit=crop&crop=face', votes: 41, party: 'Sports Unity', partyLogo: '🏆' },
+      { id: 'cg3', name: 'Nisha Pandey', class: '10th C', slogan: 'Winning Together', photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', votes: 36, party: 'Power Sports', partyLogo: '💪' }
     ]
   },
   {
     id: 'vice-captain-girl',
     title: 'Vice Captain Girl',
     candidates: [
-      { id: 'vcg1', name: 'Sakshi Agarwal', class: '9th A', slogan: 'Dedicated Service', photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face', votes: 48 },
-      { id: 'vcg2', name: 'Tanya Chopra', class: '9th B', slogan: 'Inspiring Others', photo: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=150&h=150&fit=crop&crop=face', votes: 37 },
-      { id: 'vcg3', name: 'Meera Bhat', class: '9th C', slogan: 'Leading by Example', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', votes: 40 }
+      { id: 'vcg1', name: 'Sakshi Agarwal', class: '9th A', slogan: 'Dedicated Service', photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face', votes: 48, party: 'Athletic Champions', partyLogo: '⚽' },
+      { id: 'vcg2', name: 'Tanya Chopra', class: '9th B', slogan: 'Inspiring Others', photo: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=150&h=150&fit=crop&crop=face', votes: 37, party: 'Sports Unity', partyLogo: '🏆' },
+      { id: 'vcg3', name: 'Meera Bhat', class: '9th C', slogan: 'Leading by Example', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', votes: 40, party: 'Power Sports', partyLogo: '💪' }
     ]
   }
 ];
@@ -290,7 +291,13 @@ const Index = () => {
                             <AvatarFallback>{candidate.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
-                            <div className="font-semibold text-lg">{candidate.name}</div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="font-semibold text-lg">{candidate.name}</div>
+                              <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                                <span className="text-sm">{candidate.partyLogo}</span>
+                                <span className="text-xs font-medium text-gray-700">{candidate.party}</span>
+                              </div>
+                            </div>
                             <div className="text-sm text-gray-600">Class: {candidate.class}</div>
                             <div className="text-sm text-blue-600 italic">"{candidate.slogan}"</div>
                           </div>
@@ -365,6 +372,10 @@ const Index = () => {
                               <div>
                                 <div className="flex items-center gap-3 mb-1">
                                   <div className="font-bold text-xl text-gray-800">{candidate.name}</div>
+                                  <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                                    <span className="text-sm">{candidate.partyLogo}</span>
+                                    <span className="text-xs font-medium text-gray-700">{candidate.party}</span>
+                                  </div>
                                   {votes[position.id] === candidate.id && (
                                     <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
                                       SELECTED
