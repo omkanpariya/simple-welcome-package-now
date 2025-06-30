@@ -265,7 +265,13 @@ const Index = () => {
                       <CardTitle className="text-xl text-gray-800">{position.title}</CardTitle>
                       <div className="flex items-center gap-2 text-green-600">
                         <Trophy className="h-5 w-5" />
-                        <span className="font-semibold">Leading: {leader.name}</span>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={leader.photo} alt={leader.name} />
+                            <AvatarFallback className="text-xs">{leader.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-semibold">Leading: {leader.name}</span>
+                        </div>
                       </div>
                     </div>
                   </CardHeader>
@@ -348,21 +354,28 @@ const Index = () => {
                             : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
                         }`}>
                           <RadioGroupItem value={candidate.id} id={candidate.id} className="mt-1" />
-                          <Avatar className="h-16 w-16 border-2 border-white shadow-md">
-                            <AvatarImage src={candidate.photo} alt={candidate.name} />
-                            <AvatarFallback className="text-lg font-semibold">
+                          <Avatar className="h-20 w-20 border-4 border-white shadow-lg">
+                            <AvatarImage src={candidate.photo} alt={candidate.name} className="object-cover" />
+                            <AvatarFallback className="text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                               {candidate.name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                           <Label htmlFor={candidate.id} className="flex-1 cursor-pointer">
                             <div className="flex justify-between items-center">
                               <div>
-                                <div className="font-semibold text-lg">{candidate.name}</div>
-                                <div className="text-sm text-gray-600">Class: {candidate.class}</div>
-                                <div className="text-sm text-blue-600 italic">"{candidate.slogan}"</div>
-                                <div className="text-xs text-gray-500 mt-1">Current votes: {candidate.votes}</div>
+                                <div className="flex items-center gap-3 mb-1">
+                                  <div className="font-bold text-xl text-gray-800">{candidate.name}</div>
+                                  {votes[position.id] === candidate.id && (
+                                    <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                      SELECTED
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="text-sm text-gray-600 mb-1">Class: {candidate.class}</div>
+                                <div className="text-sm text-blue-600 italic font-medium">"{candidate.slogan}"</div>
+                                <div className="text-xs text-gray-500 mt-2">Current votes: {candidate.votes}</div>
                               </div>
-                              <div className="text-3xl">
+                              <div className="text-4xl">
                                 {votes[position.id] === candidate.id ? '✅' : '⭕'}
                               </div>
                             </div>
