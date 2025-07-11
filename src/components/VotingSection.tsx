@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -35,10 +34,11 @@ export const VotingSection = ({ positions, votes, setVotes, onSubmitVote }: Voti
   const { toast } = useToast();
 
   const handleVoteChange = (positionId: string, candidateId: string) => {
-    setVotes(prev => ({
-      ...prev,
+    const newVotes = {
+      ...votes,
       [positionId]: candidateId
-    }));
+    };
+    setVotes(newVotes);
   };
 
   const handleSubmit = () => {
