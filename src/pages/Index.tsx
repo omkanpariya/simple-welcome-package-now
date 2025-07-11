@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Vote, BarChart3, Users, Trophy } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Vote } from 'lucide-react';
+import { Dashboard } from '@/components/Dashboard';
 
 interface Candidate {
   id: string;
@@ -103,7 +100,6 @@ const Index = () => {
   const [positions, setPositions] = useState<Position[]>(initialPositions);
   const [votes, setVotes] = useState<Record<string, string>>({});
   const [isVotingComplete, setIsVotingComplete] = useState(false);
-  const [activeTab, setActiveTab] = useState<'voting' | 'results'>('voting');
   const [totalVoters] = useState(246);
   const { toast } = useToast();
 
@@ -115,21 +111,14 @@ const Index = () => {
           ...position,
           candidates: position.candidates.map(candidate => ({
             ...candidate,
-            votes: candidate.votes + Math.floor(Math.random() * 3) // Random increment 0-2
+            votes: candidate.votes + Math.floor(Math.random() * 3)
           }))
         }))
       );
-    }, 5000); // Update every 5 seconds
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
-
-  const handleVoteChange = (positionId: string, candidateId: string) => {
-    setVotes(prev => ({
-      ...prev,
-      [positionId]: candidateId
-    }));
-  };
 
   const handleSubmitVote = () => {
     const totalPositions = positions.length;
@@ -144,37 +133,26 @@ const Index = () => {
       return;
     }
 
-    // Simulate adding the vote to the live count
-    setPositions(prevPositions => 
-      prevPositions.map(position => ({
-        ...position,
-        candidates: position.candidates.map(candidate => ({
-          ...candidate,
-          votes: votes[position.id] === candidate.id ? candidate.votes + 1 : candidate.votes
+    // Check if user has already voted for any position (single vote per position enforcement)
+    const hasVoted = Object.keys(votes).some(positionId => votes[positionId]);
+    if (hasVoted && votedPositions === totalPositions) {
+      // Simulate adding the vote to the live count
+      setPositions(prevPositions => 
+        prevPositions.map(position => ({
+          ...position,
+          candidates: position.candidates.map(candidate => ({
+            ...candidate,
+            votes: votes[position.id] === candidate.id ? candidate.votes + 1 : candidate.votes
+          }))
         }))
-      }))
-    );
+      );
 
-    setIsVotingComplete(true);
-    toast({
-      title: "Vote Submitted Successfully!",
-      description: "Your vote has been recorded and added to the live count. Thank you for participating!",
-    });
-  };
-
-  const getLeadingCandidate = (position: Position) => {
-    return position.candidates.reduce((prev, current) => 
-      current.votes > prev.votes ? current : prev
-    );
-  };
-
-  const getTotalVotes = (position: Position) => {
-    return position.candidates.reduce((sum, candidate) => sum + candidate.votes, 0);
-  };
-
-  const getVotePercentage = (candidate: Candidate, position: Position) => {
-    const total = getTotalVotes(position);
-    return total > 0 ? Math.round((candidate.votes / total) * 100) : 0;
+      setIsVotingComplete(true);
+      toast({
+        title: "Vote Submitted Successfully!",
+        description: "Your vote has been recorded and added to the live count. Thank you for participating!",
+      });
+    }
   };
 
   if (isVotingComplete) {
@@ -193,13 +171,6 @@ const Index = () => {
               <h3 className="text-xl font-semibold mb-2">Thank You for Voting!</h3>
               <p className="text-gray-600">Your vote has been successfully recorded and added to the live count.</p>
             </div>
-            <Button 
-              onClick={() => setActiveTab('results')}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              View Live Results
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -207,216 +178,14 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header with Tabs */}
-        <Card className="mb-6 shadow-2xl">
-          <CardHeader className="text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-            <CardTitle className="text-3xl font-bold flex items-center justify-center gap-3 mb-4">
-              <Vote className="h-8 w-8" />
-              School Election - EVM System
-            </CardTitle>
-            <div className="flex justify-center gap-4">
-              <Button
-                variant={activeTab === 'voting' ? 'default' : 'outline'}
-                onClick={() => setActiveTab('voting')}
-                className="bg-white/20 hover:bg-white/30 border-white/50"
-              >
-                <Vote className="h-4 w-4 mr-2" />
-                Cast Vote
-              </Button>
-              <Button
-                variant={activeTab === 'results' ? 'default' : 'outline'}
-                onClick={() => setActiveTab('results')}
-                className="bg-white/20 hover:bg-white/30 border-white/50"
-              >
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Live Results
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
-
-        {/* Live Results Tab */}
-        {activeTab === 'results' && (
-          <div className="space-y-6">
-            <Card className="border-green-200 bg-green-50">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Users className="h-6 w-6 text-green-600" />
-                    <span className="text-lg font-semibold text-green-800">Live Vote Count</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-green-600">
-                      {positions.reduce((sum, pos) => sum + getTotalVotes(pos), 0)}
-                    </div>
-                    <div className="text-sm text-green-600">Total Votes Cast</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {positions.map((position) => {
-              const leader = getLeadingCandidate(position);
-              return (
-                <Card key={position.id} className="shadow-lg border-2 hover:shadow-xl transition-shadow">
-                  <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl text-gray-800">{position.title}</CardTitle>
-                      <div className="flex items-center gap-2 text-green-600">
-                        <Trophy className="h-5 w-5" />
-                        <div className="flex items-center gap-2">
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={leader.photo} alt={leader.name} />
-                            <AvatarFallback className="text-xs">{leader.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <span className="font-semibold">Leading: {leader.name}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      {position.candidates
-                        .sort((a, b) => b.votes - a.votes)
-                        .map((candidate, index) => (
-                        <div key={candidate.id} className="flex items-center gap-4 p-4 border rounded-lg bg-white shadow-sm">
-                          <div className="flex items-center gap-1 text-lg font-bold text-gray-500 min-w-[24px]">
-                            {index === 0 && <Trophy className="h-5 w-5 text-yellow-500" />}
-                            #{index + 1}
-                          </div>
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={candidate.photo} alt={candidate.name} />
-                            <AvatarFallback>{candidate.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <div className="font-semibold text-lg">{candidate.name}</div>
-                              <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
-                                <span className="text-sm">{candidate.partyLogo}</span>
-                                <span className="text-xs font-medium text-gray-700">{candidate.party}</span>
-                              </div>
-                            </div>
-                            <div className="text-sm text-gray-600">Class: {candidate.class}</div>
-                            <div className="text-sm text-blue-600 italic">"{candidate.slogan}"</div>
-                          </div>
-                          <div className="text-right min-w-[120px]">
-                            <div className="text-2xl font-bold text-blue-600">{candidate.votes}</div>
-                            <div className="text-sm text-gray-600">
-                              {getVotePercentage(candidate, position)}% of votes
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
-                                style={{ width: `${getVotePercentage(candidate, position)}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Voting Tab */}
-        {activeTab === 'voting' && (
-          <>
-            {/* Voting Instructions */}
-            <Card className="mb-6 border-yellow-200 bg-yellow-50">
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-yellow-800 mb-2">📋 Voting Instructions:</h3>
-                <ul className="text-sm text-yellow-700 space-y-1">
-                  <li>• Select ONE candidate for each position by clicking on their photo or name</li>
-                  <li>• You must vote for all 8 positions to submit your ballot</li>
-                  <li>• Review your choices carefully before submitting</li>
-                  <li>• Once submitted, votes cannot be changed and will be added to live results</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Voting Interface */}
-            <div className="grid gap-6">
-              {positions.map((position) => (
-                <Card key={position.id} className="shadow-lg border-2 border-gray-200 hover:border-blue-300 transition-all duration-300">
-                  <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-200">
-                    <CardTitle className="text-xl text-center text-gray-800">
-                      {position.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <RadioGroup
-                      value={votes[position.id] || ''}
-                      onValueChange={(value) => handleVoteChange(position.id, value)}
-                      className="space-y-4"
-                    >
-                      {position.candidates.map((candidate) => (
-                        <div key={candidate.id} className={`flex items-center space-x-4 p-4 border-2 rounded-lg transition-all duration-300 cursor-pointer hover:shadow-md ${
-                          votes[position.id] === candidate.id 
-                            ? 'border-blue-500 bg-blue-50 shadow-lg' 
-                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                        }`}>
-                          <RadioGroupItem value={candidate.id} id={candidate.id} className="mt-1" />
-                          <Avatar className="h-20 w-20 border-4 border-white shadow-lg">
-                            <AvatarImage src={candidate.photo} alt={candidate.name} className="object-cover" />
-                            <AvatarFallback className="text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                              {candidate.name.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <Label htmlFor={candidate.id} className="flex-1 cursor-pointer">
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <div className="flex items-center gap-3 mb-1">
-                                  <div className="font-bold text-xl text-gray-800">{candidate.name}</div>
-                                  <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
-                                    <span className="text-sm">{candidate.partyLogo}</span>
-                                    <span className="text-xs font-medium text-gray-700">{candidate.party}</span>
-                                  </div>
-                                  {votes[position.id] === candidate.id && (
-                                    <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                                      SELECTED
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="text-sm text-gray-600 mb-1">Class: {candidate.class}</div>
-                                <div className="text-sm text-blue-600 italic font-medium">"{candidate.slogan}"</div>
-                                <div className="text-xs text-gray-500 mt-2">Current votes: {candidate.votes}</div>
-                              </div>
-                              <div className="text-4xl">
-                                {votes[position.id] === candidate.id ? '✅' : '⭕'}
-                              </div>
-                            </div>
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Submit Button */}
-            <div className="mt-8 text-center">
-              <Button
-                onClick={handleSubmitVote}
-                size="lg"
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-12 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                <Vote className="h-5 w-5 mr-2" />
-                Submit Vote
-              </Button>
-              <p className="text-sm text-gray-600 mt-2">
-                Voted for {Object.keys(votes).length} out of {positions.length} positions
-              </p>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+    <Dashboard 
+      positions={positions}
+      setPositions={setPositions}
+      votes={votes}
+      setVotes={setVotes}
+      onSubmitVote={handleSubmitVote}
+      totalVoters={totalVoters}
+    />
   );
 };
 
